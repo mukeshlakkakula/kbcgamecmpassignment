@@ -107,6 +107,7 @@ io.on("connection", (socket) => {
     } else {
       // If all questions are done
       socket.emit("gameOver", "All questions completed. Thanks for playing!");
+      currentQuestionIndex = 0;
     }
   });
 
@@ -124,7 +125,11 @@ io.on("connection", (socket) => {
         io.emit("question", questions[currentQuestionIndex]);
       } else {
         // No more questions, game over
-        io.emit("gameOver", "Congratulations! You've completed the game.");
+        io.emit(
+          "gameOver",
+          `Congratulations! ${playerName} You've completed the game.`
+        );
+        currentQuestionIndex = 0;
       }
     } else {
       // Notify the player who answered incorrectly
@@ -138,5 +143,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log("Server is running on http://localhost:5000");
+  console.log("Server is running on http://localhost:4000");
 });
