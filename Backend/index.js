@@ -6,7 +6,6 @@ const PORT = process.env.PORT || 4000;
 const app = express();
 const server = http.createServer(app);
 
-// Allow CORS for your frontend
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.header(
@@ -18,7 +17,7 @@ app.use((req, res, next) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // Frontend origin
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -90,41 +89,33 @@ const questions = [
     ],
     correctAnswer: "C",
   },
-  // ... more questions
 ];
 
-// Handle connections
 io.on("connection", (socket) => {
   console.log("A player connected");
 
-  // When a player joins the game
   socket.on("joinGame", (playerName) => {
     io.emit("newPlayer", playerName);
 
     if (currentQuestionIndex < questions.length) {
-      // Send the current question to the new player
       socket.emit("question", questions[currentQuestionIndex]);
     } else {
-      // If all questions are done
       socket.emit("gameOver", "All questions completed. Thanks for playing!");
       currentQuestionIndex = 0;
     }
   });
 
-  // When a player submits an answer
   socket.on("submitAnswer", (data) => {
     const { playerName, answer } = data;
     const correctAnswer = questions[currentQuestionIndex].correctAnswer;
 
     if (answer === correctAnswer) {
-      io.emit("correctAnswer", playerName); // Notify all players of the correct answer
+      io.emit("correctAnswer", playerName);
       currentQuestionIndex++;
 
       if (currentQuestionIndex < questions.length) {
-        // Send the next question to all players
         io.emit("question", questions[currentQuestionIndex]);
       } else {
-        // No more questions, game over
         io.emit(
           "gameOver",
           `Congratulations! ${playerName} You've completed the game.`
@@ -132,7 +123,6 @@ io.on("connection", (socket) => {
         currentQuestionIndex = 0;
       }
     } else {
-      // Notify the player who answered incorrectly
       socket.emit("wrongAnswer");
     }
   });
@@ -143,5 +133,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(PORT, () => {
-  console.log("Server is running on http://localhost:4000");
+  console.log(`Server is running on http://localhost:${4000}`);
 });
